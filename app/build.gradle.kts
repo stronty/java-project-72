@@ -1,11 +1,25 @@
 plugins {
 	application
 	checkstyle
+	jacoco
 	id("org.sonarqube") version "7.3.1.8318"
 }
 
+tasks.jacocoTestReport {
+    reports {
+        xml.required = false
+        csv.required = false
+	html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
+   }
+}
+jacoco {
+    applyTo(tasks.run.get())
+}
 
-
+tasks.register<JacocoReport>("applicationCodeCoverageReport") {
+    executionData(tasks.run.get())
+    sourceSets(sourceSets.main.get())
+}
 repositories {
     mavenCentral()
 }
