@@ -4,4 +4,4 @@
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=stronty_java-project-72&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=stronty_java-project-72) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=stronty_java-project-72&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=stronty_java-project-72) [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=stronty_java-project-72&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=stronty_java-project-72) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=stronty_java-project-72&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=stronty_java-project-72) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=stronty_java-project-72&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=stronty_java-project-72) 
 
 ### Deployed app:
-[App on Render.com](https://java-project-72.onrender.com) 
+[App on Render.com](https://java-project-72-ecsv.onrender.com) 
