@@ -1,3 +1,18 @@
+# Стили Tailwind собираются в отдельном образе с Node: они не хранятся в репозитории
+# как артефакт, а генерируются перед сборкой приложения.
+FROM node:22 AS styles
+
+WORKDIR /app
+
+COPY app/package.json app/package-lock.json app/tailwind.css ./
+
+RUN npm install
+
+# Шаблоны нужны Tailwind, чтобы найти все используемые классы.
+COPY app/src/main/resources/templates src/main/resources/templates
+
+RUN npx @tailwindcss/cli -i tailwind.css -o src/main/resources/static/main.css --minify
+
 # Сборка происходит в образе с JDK, а запуск — в лёгком образе с JRE.
 # Render.com собирает сервис по Dockerfile (java-проекты на Render не имеют
 # нативного Java-рантайма), поэтому окружение с Java и Gradle должно быть
@@ -18,6 +33,9 @@ COPY app/config config
 RUN ./gradlew --no-daemon dependencies
 
 COPY app/src src
+
+# Подкладываем собранные стили в исходники перед сборкой fat-jar.
+COPY --from=styles /app/src/main/resources/static/main.css src/main/resources/static/main.css
 
 # Собираем fat-jar (плагин shadow), в который упакованы все классы и библиотеки.
 RUN ./gradlew --no-daemon shadowJar

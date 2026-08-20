@@ -38,6 +38,9 @@ dependencies {
     implementation("com.h2database:h2:2.4.240")
     // Драйвер PostgreSQL — используется в продакшене на render.com.
     implementation("org.postgresql:postgresql:42.7.13")
+    // Шаблонизатор Jte и его интеграция с Javalin.
+    implementation("gg.jte:jte:3.2.4")
+    implementation("io.javalin:javalin-rendering-jte:7.2.2")
 }
 
 application {

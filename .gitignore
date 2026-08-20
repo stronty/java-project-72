@@ -9,3 +9,12 @@ build
 
 # Ignore IntelliJ IDEA project files (local, machine-specific settings)
 .idea/
+
+# Ignore Node.js dependencies
+node_modules
+
+# Ignore the compiled css artifact (built by the setup command)
+app/src/main/resources/static/
+
+# Ignore Jte-generated compiled templates
+jte-classes/
