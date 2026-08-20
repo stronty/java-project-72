@@ -94,6 +94,18 @@ public class UrlRepository extends BaseRepository {
         }
     }
 
+    /**
+     * Удаляет все url из базы данных. Используется в тестах.
+     *
+     * @throws SQLException при ошибке обращения к базе данных
+     */
+    public static void removeAll() throws SQLException {
+        try (var connection = dataSource.getConnection();
+                var statement = connection.createStatement()) {
+            statement.executeUpdate("DELETE FROM urls");
+        }
+    }
+
     private static Url toUrl(ResultSet resultSet) throws SQLException {
         var url = new Url(resultSet.getString("name"));
         url.setId(resultSet.getLong("id"));

@@ -15,6 +15,7 @@
                             <th class="px-4 py-2">Имя</th>
                             <th class="px-4 py-2">Дата создания</th>
                             <th class="px-4 py-2">Код ответа</th>
+                            <th class="px-4 py-2">Дата последней проверки</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -25,7 +26,16 @@
                                     <a href="/urls/${url.getId()}" class="text-blue-600 hover:underline">${url.getName()}</a>
                                 </td>
                                 <td class="px-4 py-2">${url.getCreatedAt().toLocalDateTime().toLocalDate().toString()}</td>
-                                <td class="px-4 py-2"></td>
+                                <td class="px-4 py-2">
+                                    @if(page.getLastChecks().containsKey(url.getId()))
+                                        ${page.getLastChecks().get(url.getId()).getStatusCode()}
+                                    @endif
+                                </td>
+                                <td class="px-4 py-2">
+                                    @if(page.getLastChecks().containsKey(url.getId()))
+                                        ${page.getLastChecks().get(url.getId()).getCreatedAt().toLocalDateTime().toLocalDate().toString()}
+                                    @endif
+                                </td>
                             </tr>
                         @endfor
                     </tbody>

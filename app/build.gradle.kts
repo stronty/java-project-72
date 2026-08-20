@@ -24,11 +24,12 @@ repositories {
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter-api:6.1.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.1.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    implementation("com.google.guava:guava:33.6.0-jre")
+    testImplementation("io.javalin:javalin-testtools:7.2.2")
+    testImplementation("org.assertj:assertj-core:3.27.3")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     implementation("io.javalin:javalin:7.2.2")
-    implementation("org.slf4j:slf4j-api:2.0.18")
     // Реализация логирования для slf4j — без неё javalin пишет предупреждение
     // "No SLF4J providers were found" и логи не выводятся вообще.
     implementation("org.slf4j:slf4j-simple:2.0.18")
@@ -41,6 +42,10 @@ dependencies {
     // Шаблонизатор Jte и его интеграция с Javalin.
     implementation("gg.jte:jte:3.2.4")
     implementation("io.javalin:javalin-rendering-jte:7.2.2")
+    // Парсер HTML для извлечения h1, title и description при проверке url.
+    implementation("org.jsoup:jsoup:1.19.1")
+    // HTTP-клиент для выполнения запросов к проверяемым сайтам.
+    implementation("com.konghq:unirest-java:3.14.5")
 }
 
 application {
@@ -48,9 +53,15 @@ application {
 }
 
 tasks {
+    test {
+        useJUnitPlatform()
+        // Запуск тестов также формирует отчёт о покрытии кода.
+        finalizedBy("jacocoTestReport")
+    }
+
     jacocoTestReport {
         reports {
-            xml.required = false
+            xml.required = true
             csv.required = false
             html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
         }
@@ -68,13 +79,10 @@ tasks {
     }
 }
 
-jacoco {
-    applyTo(tasks.run.get())
-}
-
-tasks.register<JacocoReport>("applicationCodeCoverageReport") {
-    executionData(tasks.run.get())
-    sourceSets(sourceSets.main.get())
+// SonarCloud анализирует покрытие по XML-отчёту jacoco, поэтому sonar
+// должен выполняться после генерации отчёта.
+tasks.named("sonar") {
+    dependsOn(tasks.named("jacocoTestReport"))
 }
 
 sonar {

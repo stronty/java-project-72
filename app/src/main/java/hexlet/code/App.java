@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.ResourceCodeResolver;
+import hexlet.code.controller.UrlChecksController;
 import hexlet.code.controller.UrlsController;
 import hexlet.code.dto.BasePage;
 import hexlet.code.repository.BaseRepository;
@@ -40,14 +41,15 @@ public final class App {
             // Корневой маршрут, который выводит главную страницу с формой.
             config.routes.get("/", ctx -> {
                 var page = new BasePage();
-                page.setFlash(ctx.consumeSessionAttribute("flash"));
-                page.setFlashType(ctx.consumeSessionAttribute("flashType"));
+                page.setFlashFromSession(ctx);
                 ctx.render("index.jte", Map.of("page", page));
             });
             // Маршруты для работы с url.
             config.routes.get(NamedRoutes.urlsPath(), UrlsController::index);
             config.routes.post(NamedRoutes.urlsPath(), UrlsController::create);
             config.routes.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
+            // Маршрут для запуска проверки url.
+            config.routes.post(NamedRoutes.checksPath("{id}"), UrlChecksController::create);
         });
         return app;
     }

@@ -4,6 +4,8 @@ import hexlet.code.dto.BasePage;
 import hexlet.code.dto.UrlPage;
 import hexlet.code.dto.UrlsPage;
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
+import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
@@ -11,6 +13,7 @@ import io.javalin.http.NotFoundResponse;
 import java.net.URI;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,9 +29,13 @@ public final class UrlsController {
      */
     public static void index(Context ctx) throws SQLException {
         var urls = UrlRepository.getEntities();
-        var page = new UrlsPage(urls);
-        page.setFlash(ctx.consumeSessionAttribute("flash"));
-        page.setFlashType(ctx.consumeSessionAttribute("flashType"));
+        var lastChecks = new HashMap<Long, UrlCheck>();
+        for (var url : urls) {
+            UrlCheckRepository.findLastByUrlId(url.getId())
+                    .ifPresent(check -> lastChecks.put(url.getId(), check));
+        }
+        var page = new UrlsPage(urls, lastChecks);
+        page.setFlashFromSession(ctx);
         ctx.render("urls/index.jte", Map.of("page", page));
     }
 
@@ -42,9 +49,9 @@ public final class UrlsController {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Url with id = " + id + " not found"));
-        var page = new UrlPage(url);
-        page.setFlash(ctx.consumeSessionAttribute("flash"));
-        page.setFlashType(ctx.consumeSessionAttribute("flashType"));
+        var checks = UrlCheckRepository.findByUrlId(id);
+        var page = new UrlPage(url, checks);
+        page.setFlashFromSession(ctx);
         ctx.render("urls/show.jte", Map.of("page", page));
     }
 

@@ -7,3 +7,7 @@ setup:
 
 sonar:
 	./gradlew build sonar --info
+
+# Запуск тестов с формированием отчёта о покрытии кода (jacoco).
+test:
+	./gradlew test
