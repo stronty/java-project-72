@@ -57,6 +57,11 @@ tasks {
     }
 
     shadowJar {
+        // Сливаем META-INF/services из всех зависимостей, чтобы в fat-jar
+        // регистрировались оба JDBC-драйвера (H2 и PostgreSQL).
+        mergeServiceFiles {
+            duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        }
         manifest {
             attributes["Main-Class"] = "hexlet.code.App"
         }

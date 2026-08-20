@@ -5,8 +5,10 @@ import com.zaxxer.hikari.HikariDataSource;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.ResourceCodeResolver;
+import hexlet.code.controller.UrlsController;
 import hexlet.code.dto.BasePage;
 import hexlet.code.repository.BaseRepository;
+import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinJte;
 import java.io.BufferedReader;
@@ -35,12 +37,17 @@ public final class App {
                 staticFileConfig.hostedPath = "/";
                 staticFileConfig.directory = "static";
             });
-            // Корневой маршрут, который выводит главную страницу.
+            // Корневой маршрут, который выводит главную страницу с формой.
             config.routes.get("/", ctx -> {
                 var page = new BasePage();
                 page.setFlash(ctx.consumeSessionAttribute("flash"));
+                page.setFlashType(ctx.consumeSessionAttribute("flashType"));
                 ctx.render("index.jte", Map.of("page", page));
             });
+            // Маршруты для работы с url.
+            config.routes.get(NamedRoutes.urlsPath(), UrlsController::index);
+            config.routes.post(NamedRoutes.urlsPath(), UrlsController::create);
+            config.routes.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
         });
         return app;
     }
@@ -62,10 +69,18 @@ public final class App {
     }
 
     private static void initDataBase() throws IOException, SQLException {
+        var databaseUrl = getDatabaseUrl();
         var hikariConfig = new HikariConfig();
         // В продакшене адрес базы задаётся снаружи через переменную окружения
         // JDBC_DATABASE_URL, при локальной разработке используется H2 в памяти.
-        hikariConfig.setJdbcUrl(getDatabaseUrl());
+        hikariConfig.setJdbcUrl(databaseUrl);
+        // Драйвер задаём явно: в fat-jar из нескольких драйверов через DriverManager
+        // регистрируется только один, и без этой строки не находится PostgreSQL.
+        if (databaseUrl.startsWith("jdbc:postgresql")) {
+            hikariConfig.setDriverClassName("org.postgresql.Driver");
+        } else {
+            hikariConfig.setDriverClassName("org.h2.Driver");
+        }
         var dataSource = new HikariDataSource(hikariConfig);
 
         var sql = readResourceFile("schema.sql");
@@ -78,8 +93,17 @@ public final class App {
     }
 
     private static String getDatabaseUrl() {
-        return System.getenv().getOrDefault(
+        var databaseUrl = System.getenv().getOrDefault(
                 "JDBC_DATABASE_URL", "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
+        // Render выдаёт ссылку на базу в формате postgres://..., а JDBC требует
+        // jdbc:postgresql://.... Нормализуем её и добавляем sslmode для TLS.
+        if (databaseUrl.startsWith("postgres://") || databaseUrl.startsWith("postgresql://")) {
+            databaseUrl = "jdbc:postgresql://" + databaseUrl.substring(databaseUrl.indexOf("://") + 3);
+            if (!databaseUrl.contains("?")) {
+                databaseUrl += "?sslmode=require";
+            }
+        }
+        return databaseUrl;
     }
 
     private static int getPort() {

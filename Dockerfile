@@ -52,4 +52,5 @@ ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=60.0 -XX:InitialRAM
 EXPOSE 7070
 
 # Render задаёт PORT через переменную окружения, приложение читает его в main().
-CMD ["java", "-jar", "app.jar"]
+# JAVA_OPTS применяем явно, чтобы работали заданные выше ограничения памяти.
+CMD ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
