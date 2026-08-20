@@ -81,6 +81,7 @@ public final class App {
         } else {
             hikariConfig.setDriverClassName("org.h2.Driver");
         }
+        configureCredentials(hikariConfig);
         var dataSource = new HikariDataSource(hikariConfig);
 
         var sql = readResourceFile("schema.sql");
@@ -104,6 +105,30 @@ public final class App {
             }
         }
         return databaseUrl;
+    }
+
+    private static void configureCredentials(HikariConfig hikariConfig) {
+        // JDBC-драйвер PostgreSQL не умеет разбирать user:password@ в URL,
+        // поэтому выносим их в отдельные поля Hikari, убирая из адреса.
+        var jdbcUrl = hikariConfig.getJdbcUrl();
+        int schemeEnd = jdbcUrl.indexOf("://");
+        if (schemeEnd == -1) {
+            return;
+        }
+        var rest = jdbcUrl.substring(schemeEnd + 3);
+        int at = rest.lastIndexOf('@');
+        if (at == -1) {
+            return;
+        }
+        var userInfo = rest.substring(0, at);
+        int colon = userInfo.indexOf(':');
+        if (colon == -1) {
+            hikariConfig.setUsername(userInfo);
+        } else {
+            hikariConfig.setUsername(userInfo.substring(0, colon));
+            hikariConfig.setPassword(userInfo.substring(colon + 1));
+        }
+        hikariConfig.setJdbcUrl(jdbcUrl.substring(0, schemeEnd + 3) + rest.substring(at + 1));
     }
 
     private static int getPort() {
