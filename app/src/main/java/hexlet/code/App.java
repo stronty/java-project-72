@@ -58,7 +58,19 @@ public final class App {
 
     private static void initDataBase() throws IOException, SQLException {
         var hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(getDatabaseUrl());
+        var databaseUrl = getDatabaseUrl();
+        int schemeEnd = databaseUrl.indexOf("://");
+        int at = databaseUrl.lastIndexOf('@');
+        if (schemeEnd != -1 && at > schemeEnd + 3) {
+            var credentials = databaseUrl.substring(schemeEnd + 3, at).split(":", 2);
+            hikariConfig.setUsername(credentials[0]);
+            if (credentials.length == 2) {
+                hikariConfig.setPassword(credentials[1]);
+            }
+            hikariConfig.setJdbcUrl(databaseUrl.substring(0, schemeEnd + 3) + databaseUrl.substring(at + 1));
+        } else {
+            hikariConfig.setJdbcUrl(databaseUrl);
+        }
         var dataSource = new HikariDataSource(hikariConfig);
 
         var sql = readResourceFile("schema.sql");
