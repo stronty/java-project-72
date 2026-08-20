@@ -32,6 +32,12 @@ dependencies {
     // Реализация логирования для slf4j — без неё javalin пишет предупреждение
     // "No SLF4J providers were found" и логи не выводятся вообще.
     implementation("org.slf4j:slf4j-simple:2.0.18")
+    // Пул соединений с базой данных.
+    implementation("com.zaxxer:HikariCP:7.1.0")
+    // Драйвер H2 — используется при локальной разработке и в тестах.
+    implementation("com.h2database:h2:2.4.240")
+    // Драйвер PostgreSQL — используется в продакшене на render.com.
+    implementation("org.postgresql:postgresql:42.7.13")
 }
 
 application {
