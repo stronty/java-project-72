@@ -29,6 +29,9 @@ dependencies {
     implementation("com.google.guava:guava:33.6.0-jre")
     implementation("io.javalin:javalin:7.2.2")
     implementation("org.slf4j:slf4j-api:2.0.18")
+    // Реализация логирования для slf4j — без неё javalin пишет предупреждение
+    // "No SLF4J providers were found" и логи не выводятся вообще.
+    implementation("org.slf4j:slf4j-simple:2.0.18")
 }
 
 application {
