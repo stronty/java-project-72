@@ -1,3 +1,6 @@
+import gg.jte.ContentType
+import java.nio.file.Path
+
 // Требования задачи: имя проекта app (задаётся в settings.gradle.kts),
 // группа hexlet.code и версия 1.0-SNAPSHOT должны быть явно объявлены здесь.
 group = "hexlet.code"
@@ -9,6 +12,7 @@ plugins {
     jacoco
     id("org.sonarqube") version "7.3.1.8318"
     id("com.gradleup.shadow") version "9.5.0"
+    id("gg.jte.gradle") version "3.2.4"
 }
 
 // Явно закрепляем версию Java 21 для исходников и байткода, чтобы сборка
@@ -17,6 +21,15 @@ plugins {
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
+}
+
+// Шаблоны Jte предкомпилируются при сборке приложения. Это нужно, чтобы
+// приложение работало в окружении без компилятора Java — например, в образе
+// с JRE на render.com, где Jte не смог бы компилировать шаблоны на лету.
+jte {
+    generate()
+    contentType = ContentType.Html
+    sourceDirectory = Path.of(project.projectDir.absolutePath, "src", "main", "resources", "templates")
 }
 
 repositories {
@@ -55,7 +68,12 @@ tasks {
             html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
         }
     }
-    
+
+    // Сгенерированный код шаблонов Jte не должен проверяться линтером.
+    checkstyleMain {
+        setSource(sourceSets.main.get().allJava.filter { file -> !file.path.contains("generated-sources") })
+    }
+
     shadowJar {
         manifest {
             attributes["Main-Class"] = "hexlet.code.App"

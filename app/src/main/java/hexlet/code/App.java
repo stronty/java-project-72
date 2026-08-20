@@ -4,7 +4,6 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
-import gg.jte.resolve.ResourceCodeResolver;
 import hexlet.code.dto.BasePage;
 import hexlet.code.repository.BaseRepository;
 import io.javalin.Javalin;
@@ -53,9 +52,10 @@ public final class App {
     }
 
     private static TemplateEngine createTemplateEngine() {
-        var classLoader = App.class.getClassLoader();
-        var codeResolver = new ResourceCodeResolver("templates", classLoader);
-        return TemplateEngine.create(codeResolver, ContentType.Html);
+        // Используем предкомпилированные шаблоны: они собираются плагином
+        // gg.jte.gradle на этапе сборки, поэтому приложение работает даже
+        // в окружении без компилятора Java (например, в образе с JRE).
+        return TemplateEngine.createPrecompiled(ContentType.Html);
     }
 
     private static void initDataBase() throws IOException, SQLException {
