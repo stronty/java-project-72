@@ -12,17 +12,8 @@ import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 import org.jsoup.Jsoup;
 
-/**
- * Обработчики маршрутов для работы с проверками url.
- */
 public final class UrlChecksController {
 
-    /**
-     * Запускает проверку url: загружает страницу и сохраняет результат.
-     *
-     * @param ctx контекст запроса
-     * @throws SQLException при ошибке обращения к базе данных
-     */
     public static void create(Context ctx) throws SQLException {
         var urlId = ctx.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.find(urlId)

@@ -16,17 +16,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Обработчики маршрутов для работы с url.
- */
 public final class UrlsController {
 
-    /**
-     * Выводит список всех добавленных url.
-     *
-     * @param ctx контекст запроса
-     * @throws SQLException при ошибке обращения к базе данных
-     */
     public static void index(Context ctx) throws SQLException {
         var urls = UrlRepository.getEntities();
         var lastChecks = new HashMap<Long, UrlCheck>();
@@ -39,12 +30,6 @@ public final class UrlsController {
         ctx.render("urls/index.jte", Map.of("page", page));
     }
 
-    /**
-     * Выводит информацию об одном url.
-     *
-     * @param ctx контекст запроса
-     * @throws SQLException при ошибке обращения к базе данных
-     */
     public static void show(Context ctx) throws SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.find(id)
@@ -55,12 +40,6 @@ public final class UrlsController {
         ctx.render("urls/show.jte", Map.of("page", page));
     }
 
-    /**
-     * Добавляет новый url в базу данных.
-     *
-     * @param ctx контекст запроса
-     * @throws SQLException при ошибке обращения к базе данных
-     */
     public static void create(Context ctx) throws SQLException {
         var input = ctx.formParam("url");
         var name = normalize(input);

@@ -9,17 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Репозиторий для работы с сущностью {@link Url}.
- */
 public class UrlRepository extends BaseRepository {
 
-    /**
-     * Сохраняет новый url в базу данных и проставляет ему сгенерированный id.
-     *
-     * @param url сохраняемый url
-     * @throws SQLException при ошибке обращения к базе данных
-     */
     public static void save(Url url) throws SQLException {
         String sql = "INSERT INTO urls (name, created_at) VALUES (?, ?)";
         try (var connection = dataSource.getConnection();
@@ -35,13 +26,6 @@ public class UrlRepository extends BaseRepository {
         }
     }
 
-    /**
-     * Возвращает url по его id.
-     *
-     * @param id идентификатор url
-     * @return найденный url или пустой Optional
-     * @throws SQLException при ошибке обращения к базе данных
-     */
     public static Optional<Url> find(long id) throws SQLException {
         String sql = "SELECT * FROM urls WHERE id = ?";
         try (var connection = dataSource.getConnection();
@@ -55,13 +39,6 @@ public class UrlRepository extends BaseRepository {
         }
     }
 
-    /**
-     * Возвращает url по его имени.
-     *
-     * @param name имя url
-     * @return найденный url или пустой Optional
-     * @throws SQLException при ошибке обращения к базе данных
-     */
     public static Optional<Url> findByName(String name) throws SQLException {
         String sql = "SELECT * FROM urls WHERE name = ?";
         try (var connection = dataSource.getConnection();
@@ -75,12 +52,6 @@ public class UrlRepository extends BaseRepository {
         }
     }
 
-    /**
-     * Возвращает все url, отсортированные по дате создания по убыванию.
-     *
-     * @return список url
-     * @throws SQLException при ошибке обращения к базе данных
-     */
     public static List<Url> getEntities() throws SQLException {
         String sql = "SELECT * FROM urls ORDER BY created_at DESC, id DESC";
         try (var connection = dataSource.getConnection();
@@ -94,11 +65,6 @@ public class UrlRepository extends BaseRepository {
         }
     }
 
-    /**
-     * Удаляет все url из базы данных. Используется в тестах.
-     *
-     * @throws SQLException при ошибке обращения к базе данных
-     */
     public static void removeAll() throws SQLException {
         try (var connection = dataSource.getConnection();
                 var statement = connection.createStatement()) {

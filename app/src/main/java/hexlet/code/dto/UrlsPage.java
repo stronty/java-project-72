@@ -5,9 +5,6 @@ import hexlet.code.model.UrlCheck;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Страница со списком всех url.
- */
 public final class UrlsPage extends BasePage {
     private final List<Url> urls;
     private final Map<Long, UrlCheck> lastChecks;

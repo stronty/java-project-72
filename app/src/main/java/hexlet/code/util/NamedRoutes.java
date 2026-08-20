@@ -1,9 +1,10 @@
 package hexlet.code.util;
 
-/**
- * Класс с именованными маршрутами приложения.
- */
 public final class NamedRoutes {
+
+    public static String defaultPage() {
+        return "/";
+    }
 
     public static String urlsPath() {
         return "/urls";

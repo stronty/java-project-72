@@ -2,9 +2,6 @@ package hexlet.code.model;
 
 import java.sql.Timestamp;
 
-/**
- * Модель проверки url-адреса: результат анализа страницы сайта.
- */
 public final class UrlCheck {
     private Long id;
     private Long urlId;

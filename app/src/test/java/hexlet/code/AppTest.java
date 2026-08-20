@@ -22,15 +22,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Интеграционные тесты обработчиков приложения.
- */
 public class AppTest {
 
-    // Клиент javalin-testtools построен на java.net.http.HttpClient, который по
-    // умолчанию не идёт по редиректу. Тесты, проверяющие страницу после
-    // редиректа, используют клиент с включённым переходом. CookieManager нужен,
-    // чтобы flash-сообщение, записанное в сессию, пережило переход по редиректу.
     private static final TestConfig FOLLOW_REDIRECTS = new TestConfig(
             true, true, HttpClient.newBuilder()
                     .followRedirects(HttpClient.Redirect.NORMAL)
@@ -47,7 +40,6 @@ public class AppTest {
             </html>
             """;
 
-    // Мок-сервер, имитирующий проверяемый сайт, чтобы тесты не ходили в сеть.
     private static MockWebServer mockWebServer;
 
     private Javalin app;
@@ -95,21 +87,18 @@ public class AppTest {
             assertThat(response.code()).isEqualTo(200);
             assertThat(response.body().string()).contains("https://example.com");
 
-            // Страница добавленного url должна открываться по адресу /urls/{id}.
             var url = UrlRepository.findByName("https://example.com").orElseThrow();
             var pageResponse = client.get(NamedRoutes.urlPath(url.getId()));
             assertThat(pageResponse.code()).isEqualTo(200);
             assertThat(pageResponse.body().string()).contains("https://example.com");
         });
 
-        // Нужная сущность должна быть добавлена в базу данных.
         assertThat(UrlRepository.findByName("https://example.com")).isPresent();
         assertThat(UrlRepository.getEntities()).hasSize(1);
     }
 
     @Test
     public void testCreateUrlRedirect() {
-        // Клиент не идёт по редиректу, поэтому виден ответ 302.
         JavalinTest.test(app, (server, client) -> {
             var response = client.post(NamedRoutes.urlsPath(), "url=https://example.com");
             assertThat(response.code()).isEqualTo(302);
@@ -122,8 +111,6 @@ public class AppTest {
             var first = client.post(NamedRoutes.urlsPath(), "url=https://example.com");
             assertThat(first.code()).isEqualTo(200);
 
-            // Повторное добавление того же url открывает страницу уже
-            // существующей сущности, не создавая дубликат в базе.
             var second = client.post(NamedRoutes.urlsPath(), "url=https://example.com");
             assertThat(second.code()).isEqualTo(200);
             assertThat(second.body().string()).contains("Страница уже существует");
@@ -190,7 +177,6 @@ public class AppTest {
                     .contains(">200<");
         });
 
-        // Проверка должна сохраниться в базе данных с распарсенными полями.
         var checks = UrlCheckRepository.findByUrlId(url.getId());
         assertThat(checks).hasSize(1);
         var check = checks.get(0);
@@ -212,7 +198,6 @@ public class AppTest {
             assertThat(response.body().string()).contains("Произошла ошибка при проверке");
         });
 
-        // При ошибке проверки запись в базу не создаётся.
         assertThat(UrlCheckRepository.findByUrlId(url.getId())).isEmpty();
     }
 
@@ -230,7 +215,6 @@ public class AppTest {
             var response = client.post(NamedRoutes.checksPath(url.getId()));
             assertThat(response.code()).isEqualTo(200);
             var body = response.body().string();
-            // Длинные значения обрезаются до 200 символов с троеточием.
             assertThat(body).contains("a".repeat(200) + "...");
             assertThat(body).doesNotContain(longValue);
         });
@@ -247,7 +231,6 @@ public class AppTest {
             var check = UrlCheckRepository.findByUrlId(url.getId()).get(0);
             var lastCheckDate = check.getCreatedAt().toLocalDateTime().toLocalDate().toString();
 
-            // На странице списка сайтов выводятся данные последней проверки.
             var response = client.get(NamedRoutes.urlsPath());
             assertThat(response.code()).isEqualTo(200);
             assertThat(response.body().string())
@@ -257,4 +240,3 @@ public class AppTest {
         });
     }
 }
-

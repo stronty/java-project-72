@@ -1,5 +1,3 @@
-# Команду setup вызывает система проверки перед запуском тестов.
-# Она собирает стили Tailwind и дистрибутив приложения.
 setup:
 	npm install
 	npx @tailwindcss/cli -i tailwind.css -o src/main/resources/static/main.css --minify
@@ -8,6 +6,5 @@ setup:
 sonar:
 	./gradlew build sonar --info
 
-# Запуск тестов с формированием отчёта о покрытии кода (jacoco).
 test:
 	./gradlew test

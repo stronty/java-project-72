@@ -9,17 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Репозиторий для работы с сущностью {@link UrlCheck}.
- */
 public class UrlCheckRepository extends BaseRepository {
 
-    /**
-     * Сохраняет новую проверку в базу данных и проставляет ей сгенерированный id.
-     *
-     * @param check сохраняемая проверка
-     * @throws SQLException при ошибке обращения к базе данных
-     */
     public static void save(UrlCheck check) throws SQLException {
         String sql = "INSERT INTO url_checks (url_id, status_code, title, h1, description, created_at) "
                 + "VALUES (?, ?, ?, ?, ?, ?)";
@@ -40,13 +31,6 @@ public class UrlCheckRepository extends BaseRepository {
         }
     }
 
-    /**
-     * Возвращает все проверки url, отсортированные по дате создания по убыванию.
-     *
-     * @param urlId идентификатор url
-     * @return список проверок
-     * @throws SQLException при ошибке обращения к базе данных
-     */
     public static List<UrlCheck> findByUrlId(Long urlId) throws SQLException {
         String sql = "SELECT * FROM url_checks WHERE url_id = ? ORDER BY created_at DESC, id DESC";
         try (var connection = dataSource.getConnection();
@@ -61,13 +45,6 @@ public class UrlCheckRepository extends BaseRepository {
         }
     }
 
-    /**
-     * Возвращает последнюю проверку url.
-     *
-     * @param urlId идентификатор url
-     * @return последняя проверка или пустой Optional
-     * @throws SQLException при ошибке обращения к базе данных
-     */
     public static Optional<UrlCheck> findLastByUrlId(Long urlId) throws SQLException {
         String sql = "SELECT * FROM url_checks WHERE url_id = ? ORDER BY created_at DESC, id DESC LIMIT 1";
         try (var connection = dataSource.getConnection();
@@ -81,11 +58,6 @@ public class UrlCheckRepository extends BaseRepository {
         }
     }
 
-    /**
-     * Удаляет все проверки из базы данных. Используется в тестах.
-     *
-     * @throws SQLException при ошибке обращения к базе данных
-     */
     public static void removeAll() throws SQLException {
         try (var connection = dataSource.getConnection();
                 var statement = connection.createStatement()) {

@@ -4,9 +4,6 @@ import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 import java.util.List;
 
-/**
- * Страница с информацией об одном url.
- */
 public final class UrlPage extends BasePage {
     private final Url url;
     private final List<UrlCheck> checks;

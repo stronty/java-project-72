@@ -2,9 +2,6 @@ package hexlet.code.model;
 
 import java.sql.Timestamp;
 
-/**
- * Модель url-адреса, добавленного на сайт.
- */
 public final class Url {
     private Long id;
     private String name;
