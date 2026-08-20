@@ -40,8 +40,9 @@ COPY --from=styles /app/src/main/resources/static/main.css src/main/resources/st
 # Собираем fat-jar (плагин shadow), в который упакованы все классы и библиотеки.
 RUN ./gradlew --no-daemon shadowJar
 
-# Финальный образ только с рантаймом — без компилятора и средств сборки.
-FROM eclipse-temurin:21-jre
+# Jte компилирует шаблоны на лету через javax.tools (JavaClassCompiler),
+# поэтому в финальном образе нужен полный JDK с javac, а не только JRE.
+FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
 
